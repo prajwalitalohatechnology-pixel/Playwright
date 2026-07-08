@@ -1,0 +1,22 @@
+{
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/luxon": "^3.7.1",
+    "@types/node": "^25.5.0",
+    "luxon": "^3.7.2",
+    "typescript": "^6.0.2"
+  },
+  "name": "playwright",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "playwright": "^1.58.2",
+    "playwright-core": "^1.58.2"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
