@@ -11,9 +11,7 @@ test('Verify login functionality', async ({ page }) => {
 
     await loginPage.navigate();
     await loginPage.login(loginData.username, loginData.password);
-    // close any post-login toast message, if present
-   await 
-
+    
     // FBA Flow
   await fbaPage.openBehaviorSupportMenu();
   await fbaPage.openFBASection();
@@ -23,5 +21,20 @@ test('Verify login functionality', async ({ page }) => {
   await fbaPage.enterMFHealthandSafetyConcerns('Testing2');
   await fbaPage.enterMFSignificantChangesorEvents('Testing3');
   await fbaPage.clickSave();
+  await fbaPage.clickBehaviors();
+  await fbaPage.clickAddNew();
+  await fbaPage.selectStartDate();
+  await fbaPage.selectAddressedinBSP();
+  await fbaPage.enterTargetBehavior('Testing Target Behavior');
+  await fbaPage.enterReplacementActivities('Testing Replacement Activities');
+  await fbaPage.enterInterventions('Testing Interventions');
+  await fbaPage.enterTempBSPTargetBehavior('Testing Temp BSP Target Behavior');
+  await fbaPage.clickReplacementBehaviorAddNew();
+  await fbaPage.enterReplacementBehavior('Testing Replacement Behavior');
+  await fbaPage.clickReplacementBehaviorSave();
+  await fbaPage.clickReinforcementBehaviorAddNew();
+  await fbaPage.enterReinforcementBehavior('Testing Reinforcement Behavior');
+  await fbaPage.clickReinforcementBehaviorSave();
+  await fbaPage.clickTargetBehaviorSave();
 
 });
