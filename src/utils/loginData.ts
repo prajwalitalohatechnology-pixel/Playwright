@@ -1,5 +1,5 @@
 
 export const loginData = {
-    username: 'evergreen',
-    password: 'mb'
-};
+    username: "evergreen",
+    password: "mb"
+}
