@@ -93,7 +93,7 @@ readonly reinforcementSave;
         await this.click(this.behaviors);
         await this.click(this.addBehavior);
         await this.selectDate(this.startDate, '31');
-        await this.selectDropdown(this.addressed, 'Yes');
+        await this.addressed.selectOption('Yes');
         await this.fill(this.targetBehavior, data.targetBehavior);
         await this.fill(this.replacementActivities, data.replacementActivities);
         await this.fill(this.interventions, data.interventions);

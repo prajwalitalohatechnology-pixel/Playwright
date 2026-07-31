@@ -11,3 +11,10 @@ export const fbaData = {
     replacementBehavior: 'Testing Replacement Behavior',
     reinforcementBehavior: 'Testing Reinforcement Behavior'
 };
+
+export const palData = {
+    description: 'Testing1',
+    amountOfCashAndCashEquivalentsAtTheParticipantsResidenceDayProgram: '100',
+    amountOfMoneyInTheParticipantOwnedAccount: '200',
+    amountOfMoneyInTheParticipantAgencyBankAccount: '300',
+};

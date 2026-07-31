@@ -1,71 +1,63 @@
 import { Page } from '@playwright/test';
+import { CommonUtility } from '../utils/commonUtility';
 
-export class PalPage {
-    constructor(private page: Page) { }
+export class PalPage extends CommonUtility {
 
-    // Locators
-    palMenu = '(//span[@class="nav-menu-text ng-star-inserted"])[6]';
-    clientName = '//span[@title="RoyKent"]';
-    addButton = '//span[@class="mat-mdc-button-persistent-ripple mdc-fab__ripple"]';
-    createButton = '//span[text()="CREATE"]';
+    readonly palMenu;
+    readonly clientName;
+    readonly addButton;
+    readonly createButton;
+    readonly startDateIcon;
+    readonly typeDropdown;
+    readonly typeOption;
+    readonly textArea;
+    readonly amount1;
+    readonly amount2;
+    readonly amount3;
+    readonly saveButton;
+    readonly palCard;
 
-    startDateIcon = '(//span[@class="mat-mdc-button-touch-target"])[4]';
-    startDate = '(//span[@class="mat-calendar-body-cell-preview"])[3]';
+    
+        // Locators
+        constructor(page: Page) {
+            super(page);
 
-    dropdown = '#mat-select-value-17';
-    dropdownOption = '(//span[@class="app-text-color"])[3]';
-
-    textArea = '#txtArea';
-
-    amount1 = '(//input[@type="text"])[1]';
-    amount2 = '(//input[@type="text"])[2]';
-    amount3 = '(//input[@type="text"])[3]';
-
-    endDateIcon = '(//span[@class="mat-mdc-button-touch-target"])[5]';
-    endDate = '(//span[@class="mat-calendar-body-cell-content mat-focus-indicator"])[11]';
-
-    saveButton = '//span[text()="Save"]';
+            this.palMenu = page.getByText('Personal Allowance Ledger');
+            this.clientName = page.getByTitle('RoyKent');
+            this.addButton = page.getByText('ADD NEW');
+            this.createButton = page.locator("//span[@class='btn-text create-btn-text title']");
+            this.startDateIcon = page.locator('(//span[@class="mat-mdc-button-touch-target"])[4]');
+            this.typeDropdown = page.locator('#mat-select-value-15');
+            this.typeOption = page.getByText('Clothing');
+            this.textArea = page.locator('#txtArea');
+            this.amount1 = page.locator('(//input[@type="text"])[1]');
+            this.amount2 = page.locator('(//input[@type="text"])[2]');
+            this.amount3 = page.locator('(//input[@type="text"])[3]');
+            this.saveButton = page.getByText('Save');
+            this.palCard = page.locator('(//div[@class="card-content"])[1]');
+        }
 
     // Methods
-    async openPALSection() {
-        await this.page.locator(this.palMenu).click();
-    }
-
-    async selectClient() {
-        await this.page.locator(this.clientName).click();
-    }
-
     async createPAL() {
-        await this.page.locator(this.addButton).click();
-        await this.page.locator(this.createButton).click();
+        await this.click(this.palMenu);
+        await this.click(this.clientName);
+        await this.click(this.addButton);
+        await this.click(this.createButton);
+        await this.selectDate(this.startDateIcon, '31');
+        await this.click(this.typeDropdown);
+        await this.click(this.typeOption);
+
     }
 
-    async selectStartDate() {
-        await this.page.locator(this.startDateIcon).click();
-        await this.page.locator(this.startDate).click();
-    }
-
-    async selectDropdownValue() {
-        await this.page.locator(this.dropdown).click();
-        await this.page.locator(this.dropdownOption).click();
-    }
-
-    async enterDescription(text: string) {
-        await this.page.locator(this.textArea).fill(text);
-    }
-
-    async enterAmounts(value1: string, value2: string, value3: string) {
-        await this.page.locator(this.amount1).fill(value1);
-        await this.page.locator(this.amount2).fill(value2);
-        await this.page.locator(this.amount3).fill(value3);
-    }
-
-    async selectEndDate() {
-        await this.page.locator(this.endDateIcon).click();
-        await this.page.locator(this.endDate).click();
-    }
-
-    async clickSave() {
-        await this.page.locator(this.saveButton).click();
+    async fillPALInformation(data: any) {
+        await this.fill(this.textArea, data.description);
+        await this.fill(this.amount1, data.amountOfCashAndCashEquivalentsAtTheParticipantsResidenceDayProgram);
+        await this.fill(this.amount2, data.amountOfMoneyInTheParticipantOwnedAccount);
+        await this.fill(this.amount3, data.amountOfMoneyInTheParticipantAgencyBankAccount);
+        await this.selectDate(this.startDateIcon, '31');
+        await this.click(this.saveButton);
     }
 }
+
+
+

@@ -18,5 +18,4 @@ test('Verify login functionality', async ({ page }) => {
   await fbaPage.openFBA();
   await fbaPage.fillGeneralInformation(fbaData);
   await fbaPage.fillBehavior(fbaData);
-
 });
