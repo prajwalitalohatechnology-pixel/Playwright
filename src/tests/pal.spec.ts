@@ -15,4 +15,5 @@ test('To verify PAL functionality', async ({ page }) => {
   // PAL Flow
   await palPage.createPAL();
   await palPage.fillPALInformation(palData);
+  await palPage.createTransactions(palData);
 });

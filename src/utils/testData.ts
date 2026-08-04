@@ -17,4 +17,7 @@ export const palData = {
     amountOfCashAndCashEquivalentsAtTheParticipantsResidenceDayProgram: '100',
     amountOfMoneyInTheParticipantOwnedAccount: '200',
     amountOfMoneyInTheParticipantAgencyBankAccount: '300',
+    depositAmount: '500',
+    customizableNoteLabel: 'Testing Customizable Note Label',
+    paltransactionDeposit: 'Testing PAL Transaction Deposit'
 };

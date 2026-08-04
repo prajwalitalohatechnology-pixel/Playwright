@@ -3,10 +3,9 @@ import { Page, Locator } from '@playwright/test';
 export class CommonUtility {
     constructor(protected page: Page) { }
 
-
-    async click(locator: Locator) {
+    async click(locator: Locator, force = false) {
         await locator.waitFor({ state: 'visible', timeout: 60000 });
-        await locator.click();
+        await locator.click({ force });
     }
 
     async fill(locator: Locator, value: string) {
@@ -28,12 +27,44 @@ export class CommonUtility {
         await this.click(dropdown);
         await this.click(option);
     }
+    /**
+   * Select a random date from today onward in the currently displayed month.
+   * @param dateIconLocator - Locator for the calendar icon/input that opens the date picker.
+   */
+    async selectRandomFutureDate(dateIconLocator: Locator): Promise<number> {
+        // Open the date picker
+        await dateIconLocator.click();
 
-    async selectDate(icon: Locator, day: string) {
-        await this.click(icon);
-        await this.page.locator(`//span[normalize-space()='${day}']`).click();
+        // Find all enabled dates in the current month
+        const enabledDates = this.page.locator(
+            '//td[contains(@class,"mat-calendar-body-cell") and not(contains(@class,"mat-calendar-body-disabled"))]//span[contains(@class,"mat-calendar-body-cell-content")]'
+        );
+        const count = await enabledDates.count();
+        if (count === 0) {
+            throw new Error('No enabled dates found in the date picker.');
+        }
+        const today = new Date().getDate();
+        const futureIndexes: number[] = [];
+        for (let i = 0; i < count; i++) {
+            const text = (await enabledDates.nth(i).textContent())?.trim() || '';
+            const day = Number(text);
+            if (!Number.isNaN(day) && day >= today) {
+                futureIndexes.push(i);
+            }
+        }
+        if (futureIndexes.length === 0) {
+            throw new Error('No future dates available in the current month.');
+        }
+        const randomIndex = futureIndexes[Math.floor(Math.random() * futureIndexes.length)];
+        if (randomIndex === undefined) {
+            throw new Error('Unable to choose a future date from the calendar.');
+        }
+        const selectedDay = Number(
+            (await enabledDates.nth(randomIndex).textContent())?.trim()
+        );
+        await enabledDates.nth(randomIndex).click();
+        return selectedDay;
     }
-
     async waitForVisible(locator: Locator) {
         await locator.waitFor({
             state: 'visible',

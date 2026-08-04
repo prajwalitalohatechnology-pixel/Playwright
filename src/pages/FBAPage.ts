@@ -92,7 +92,7 @@ readonly reinforcementSave;
     async fillBehavior(data: any) {
         await this.click(this.behaviors);
         await this.click(this.addBehavior);
-        await this.selectDate(this.startDate, '31');
+        const selectedDate = await this.selectRandomFutureDate(this.startDate);
         await this.addressed.selectOption('Yes');
         await this.fill(this.targetBehavior, data.targetBehavior);
         await this.fill(this.replacementActivities, data.replacementActivities);
