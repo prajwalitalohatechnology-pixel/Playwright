@@ -37,8 +37,8 @@ export class PalPage extends CommonUtility {
         this.addButton = page.getByText('ADD NEW');
         this.createButton = page.locator("//span[@class='btn-text create-btn-text title']");
         this.startDateIcon = page.locator('(//span[@class="mat-mdc-button-touch-target"])[4]');
-        this.typeDropdown = page.getByRole('combobox', { name: /type/i }).first();
-        this.typeOption = page.getByRole('option', { name: /clothing/i }).first();
+        this.typeDropdown = page.getByRole('combobox', { name: /type/i });
+        this.typeOption = this.page.locator('//mat-option//span'); //page.getByRole('option').filter({ hasText: /clothing/i });
         this.textArea = page.locator('#txtArea');
         this.amount1 = page.locator('(//input[@type="text"])[1]');
         this.amount2 = page.locator('(//input[@type="text"])[2]');
@@ -46,16 +46,15 @@ export class PalPage extends CommonUtility {
         this.saveButton = page.locator('button').filter({ hasText: /^Save$/ }).first();
         this.palCard = page.locator('(//div[@class="card-content"])[1]');
         this.transactionstype = page.getByRole('combobox', { name: /transaction type/i });
-        this.depositOption = page.getByRole('option', { name: /deposit/i }).first();
+        this.depositOption = this.page.locator('//mat-option//span'); //page.getByRole('option').filter({ hasText: /deposit/i });
         this.depositamount = page.locator('//input[@type="number"]');
         this.dateoftransaction = page.locator('mat-form-field').filter({ hasText: /Date of Transaction/i }).getByLabel('Open calendar');
         this.perposeDropdown = page.getByRole('combobox', { name: /purpose/i });
-        this.perposeOption = page.getByRole('option', { name: /allowance/i }).first();
+        this.perposeOption = this.page.locator('//mat-option//span'); //page.getByRole('option').filter({ hasText: /allowance/i });
         this.statusDropdown = page.getByRole('combobox', { name: /status/i });
-        this.statusOption = page.getByRole('option', { name: /draft/i }).first();
+        this.statusOption = page.getByRole('option').filter({ hasText: /draft/i }); //this.page.locator('//mat-option//span'); 
         this.customizableNoteLabel = page.getByText('Customizable Note Label');
         this.paltransactionDeposit = page.getByText('PAL Transaction Deposit');
-
 
     }
 
@@ -66,8 +65,7 @@ export class PalPage extends CommonUtility {
         await this.click(this.addButton);
         await this.click(this.createButton);
         const selectedDate = await this.selectRandomFutureDate(this.startDateIcon);
-        await this.click(this.typeDropdown);
-        await this.click(this.typeOption);
+        const typeDropdownOption = await this.selectRandomOption(this.typeDropdown, this.typeOption);
 
     }
     async fillPALInformation(data: any) {
@@ -87,10 +85,8 @@ export class PalPage extends CommonUtility {
         await this.click(this.depositOption);
         await this.fill(this.depositamount, data.depositAmount);
         const selectedDate = await this.selectRandomFutureDate(this.dateoftransaction);
-        await this.click(this.perposeDropdown);
-        await this.click(this.perposeOption);
-        await this.click(this.statusDropdown);
-        await this.click(this.statusOption);
+        const selectedPurposeOption = await this.selectRandomOption(this.perposeDropdown, this.perposeOption);
+        const selectedStatusOption = await this.selectRandomOption(this.statusDropdown, this.statusOption);
         await this.fill(this.customizableNoteLabel, data.customizableNoteLabel);
         await this.fill(this.paltransactionDeposit, data.paltransactionDeposit);
         await this.click(this.saveButton, true);

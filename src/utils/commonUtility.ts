@@ -22,14 +22,9 @@ export class CommonUtility {
         await this.click(locator);
         await this.waitForSpinner();
     }
-
-    async selectDropdown(dropdown: Locator, option: Locator) {
-        await this.click(dropdown);
-        await this.click(option);
-    }
     /**
    * Select a random date from today onward in the currently displayed month.
-   * @param dateIconLocator - Locator for the calendar icon/input that opens the date picker.
+   * dateIconLocator - Locator for the calendar icon/input that opens the date picker.
    */
     async selectRandomFutureDate(dateIconLocator: Locator): Promise<number> {
         // Open the date picker
@@ -91,5 +86,44 @@ export class CommonUtility {
         await this.click(addButton);
         await this.click(createButton);
     }
+    // =========================
+    // Dropdown Utility
+    // =========================
+    /**
+   * Select a random option from a dropdown.
+   * @param dropdown - Locator of the dropdown.
+   * @param options - Locator of all dropdown options.
+   * @returns Selected option text.
+   */
+    async selectRandomOption(
+        dropdown: Locator,
+        options: Locator
+    ): Promise<string> {
+        await dropdown.click();
 
+        await options.first().waitFor({
+            state: 'visible',
+            timeout: 10000
+        });
+
+        const count = await options.count();
+        const randomIndex = Math.floor(Math.random() * count);
+
+        const option = options.nth(randomIndex);
+        const selectedText = (await option.textContent())?.trim() || '';
+
+        await option.click();
+
+        return selectedText;
+    }
+    async selectOptionByText(
+        dropdown: Locator,
+        optionText: string
+    ) {
+        await dropdown.click();
+
+        await this.page
+            .locator(`//mat-option//span[normalize-space()="${optionText}"]`)
+            .click();
+    }
 }
