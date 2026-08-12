@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.62.1",
     "@types/luxon": "^3.7.1",
     "@types/node": "^25.5.0",
     "luxon": "^3.7.2",
@@ -18,5 +18,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "directories": {
+    "test": "tests"
+  },
   "description": ""
 }
