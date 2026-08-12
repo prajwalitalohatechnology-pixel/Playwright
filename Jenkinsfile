@@ -5,54 +5,53 @@ pipeline {
         nodejs 'NodeJS18'
     }
 
+    environment {
+        PLAYWRIGHT_BROWSERS_PATH = 'C:\\playwright-browsers'
+    }
+
     stages {
 
-        stage('Checkout') {
+        stage('Debug Environment') {
             steps {
-                git branch: 'main',
-                url: 'https://github.com/prajwalitalohatechnology-pixel/Playwright.git'
+                bat 'echo Workspace: %WORKSPACE%'
+                bat 'node -v'
+                bat 'npm -v'
+                bat 'npx playwright --version'
+                bat 'echo Browser Path: %PLAYWRIGHT_BROWSERS_PATH%'
+                bat 'dir C:\\playwright-browsers'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                bat 'npm install'  
+                bat 'npm install'
             }
         }
 
         stage('Run Playwright Tests') {
             steps {
-                bat 'npx playwright test'
+                bat 'npx playwright test --reporter=list'
             }
         }
 
         stage('Publish HTML Report') {
             steps {
                 publishHTML(target: [
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
                     reportDir: 'playwright-report',
                     reportFiles: 'index.html',
-                    reportName: 'Playwright Report'
+                    reportName: 'Playwright Report',
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true,
+                    allowMissing: true
                 ])
             }
         }
     }
 
     post {
-
         always {
             archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
             archiveArtifacts artifacts: 'test-results/**', fingerprint: true
-        }
-
-        success {
-            echo 'Tests passed successfully'
-        }
-
-        failure {
-            echo 'Tests failed'
         }
     }
 }

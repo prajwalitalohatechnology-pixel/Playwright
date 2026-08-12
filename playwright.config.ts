@@ -23,7 +23,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
+     ['html', { outputFolder: 'playwright-report', open: 'never' }],
     ['list']
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -35,7 +35,8 @@ export default defineConfig({
     trace: 'on-first-retry',
      baseURL: 'https://192.168.70.183/now',
       ignoreHTTPSErrors: true, //  bypass self-signed cert
-    headless: false,
+     headless: true,
+    browserName: 'chromium',
     navigationTimeout: 60000,
 
      // Take screenshot only on test failure
