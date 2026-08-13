@@ -3,14 +3,19 @@ import { Page, Locator } from '@playwright/test';
 export class CommonUtility {
     constructor(protected page: Page) { }
 
+    // Safe click (avoids strict mode issues)
     async click(locator: Locator, force = false) {
-        await locator.waitFor({ state: 'visible', timeout: 60000 });
-        await locator.click({ force });
+        const element = locator.first();
+        await element.waitFor({ state: 'visible', timeout: 60000 });
+        await element.click({ force });
+
     }
 
+    // Safe fill
     async fill(locator: Locator, value: string) {
-        await locator.waitFor({ state: 'visible', timeout: 60000 });
-        await locator.fill(value);
+        const element = locator.first();
+        await element.waitFor({ state: 'visible', timeout: 60000 });
+        await element.fill(value);
     }
 
     async waitForSpinner() {
@@ -87,43 +92,64 @@ export class CommonUtility {
         await this.click(createButton);
     }
     // =========================
-    // Dropdown Utility
+    // Angular Material Dropdown Utilities
     // =========================
+
     /**
-   * Select a random option from a dropdown.
-   * @param dropdown - Locator of the dropdown.
-   * @param options - Locator of all dropdown options.
-   * @returns Selected option text.
-   */
-    async selectRandomOption(
-        dropdown: Locator,
-        options: Locator
-    ): Promise<string> {
+     * Select an option from Angular Material dropdown by visible text.
+     */
+   async selectMatOption(dropdown: Locator, optionText: string): Promise<void> {
+    // Close any existing overlay first
+    const backdrop = this.page.locator('.cdk-overlay-backdrop-showing');
+
+    if (await backdrop.count() > 0) {
+        await this.page.keyboard.press('Escape');
+        await backdrop.first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+    }
+
+    await dropdown.waitFor({ state: 'visible', timeout: 60000 });
+    await dropdown.click();
+
+    const option = this.page
+        .locator('mat-option')
+        .filter({ hasText: optionText });
+
+    await option.first().waitFor({ state: 'visible', timeout: 10000 });
+    await option.first().click();
+}
+
+    /**
+     * Select a random option from Angular Material dropdown.
+     * Returns the selected option text.
+     */
+    async selectRandomOption(dropdown: Locator): Promise<string> {
+        await dropdown.waitFor({ state: 'visible', timeout: 60000 });
         await dropdown.click();
-
-        await options.first().waitFor({
-            state: 'visible',
-            timeout: 10000
-        });
-
+        const options = this.page.locator('mat-option');
+        await options.first().waitFor({ state: 'visible', timeout: 10000 });
         const count = await options.count();
+        if (count === 0) {
+            throw new Error('No dropdown options found');
+        }
         const randomIndex = Math.floor(Math.random() * count);
-
         const option = options.nth(randomIndex);
         const selectedText = (await option.textContent())?.trim() || '';
-
         await option.click();
-
         return selectedText;
-    }
-    async selectOptionByText(
-        dropdown: Locator,
-        optionText: string
-    ) {
-        await dropdown.click();
 
-        await this.page
-            .locator(`//mat-option//span[normalize-space()="${optionText}"]`)
-            .click();
+    }
+        async waitForOverlayToClose() {
+    const backdrop = this.page.locator('.cdk-overlay-backdrop-showing');
+
+    if (await backdrop.count() > 0) {
+        await backdrop.first().waitFor({
+            state: 'hidden',
+            timeout: 10000
+        }).catch(() => {});
     }
 }
+    }
+
+
+
+

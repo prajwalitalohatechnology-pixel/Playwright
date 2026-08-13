@@ -3,39 +3,39 @@ import { CommonUtility } from '../utils/commonUtility';
 
 export class FBAPage extends CommonUtility {
 
-   // Navigation
-readonly behaviorSupportMenu;
-readonly fbaMenu;
-readonly clientName;
+    // Navigation
+    readonly behaviorSupportMenu;
+    readonly fbaMenu;
+    readonly clientName;
 
-// FBA General
-readonly addButton;
-readonly createButton;
-readonly consumerLevel;
-readonly healthSafety;
-readonly significantChanges;
-readonly saveButton;
+    // FBA General
+    readonly addButton;
+    readonly createButton;
+    readonly consumerLevel;
+    readonly healthSafety;
+    readonly significantChanges;
+    readonly saveButton;
 
-// Behavior
-readonly behaviors;
-readonly addBehavior;
-readonly startDate;
-readonly addressed;
-readonly targetBehavior;
-readonly replacementActivities;
-readonly interventions;
-readonly tempBehavior;
+    // Behavior
+    readonly behaviors;
+    readonly addBehavior;
+    readonly startDate;
+    readonly addressed;
+    readonly targetBehavior;
+    readonly replacementActivities;
+    readonly interventions;
+    readonly tempBehavior;
 
-// Replacement
-readonly replacementAdd;
-readonly replacementInput;
-readonly replacementSave;
+    // Replacement
+    readonly replacementAdd;
+    readonly replacementInput;
+    readonly replacementSave;
 
-// Reinforcement
-readonly reinforcementAdd;
-readonly reinforcementInput;
-readonly reinforcementSave;
-   spinner: Locator;
+    // Reinforcement
+    readonly reinforcementAdd;
+    readonly reinforcementInput;
+    readonly reinforcementSave;
+    spinner: Locator;
 
 
     constructor(page: Page) {
@@ -53,9 +53,9 @@ readonly reinforcementSave;
         this.consumerLevel = page.locator('#txtArea30116');
         this.healthSafety = page.locator('#txtArea30117');
         this.significantChanges = page.locator('#txtArea30118');
-        this.saveButton = page.locator('(//span[contains(text(),"Save")])[3]');  
-        this.spinner = page.locator('//div[contains(@class,"container-loader")]');   
-        
+        this.saveButton = page.locator('(//span[contains(text(),"Save")])[3]');
+        this.spinner = page.locator('//div[contains(@class,"container-loader")]');
+
         // --- FBA Behavior Section ---
         this.behaviors = this.page.getByText('FBA Behavior six');
         this.addBehavior = page.locator('(//a[contains(text(),"ADD NEW")])[5]');
@@ -70,10 +70,10 @@ readonly reinforcementSave;
         this.replacementInput = page.locator('//span[contains(text(),"Save")])[2]');
         this.replacementSave = page.locator('(//span[@class="m-1"][normalize-space()="ADD NEW"])[2]');
         this.reinforcementAdd = page.locator("(//input[@id='mat-input-61'])[1]");
-        this.reinforcementInput = page.locator('(//span[contains(text(),"Save")])[2]');  
+        this.reinforcementInput = page.locator('(//span[contains(text(),"Save")])[2]');
         this.reinforcementSave = page.locator('//span[contains(text(),"Save")]')
-      }
-      
+    }
+
     async openFBA() {
         await this.click(this.behaviorSupportMenu);
         await this.click(this.fbaMenu);
@@ -93,12 +93,12 @@ readonly reinforcementSave;
         await this.click(this.behaviors);
         await this.click(this.addBehavior);
         const selectedDate = await this.selectRandomFutureDate(this.startDate);
-        await this.click(this.addressed);
-        await this.click(this.page.getByRole('option', { name: /yes/i }));
+        const utility = new CommonUtility(this.page);
+        await utility.selectMatOption(this.addressed, 'Yes');
         await this.fill(this.targetBehavior, data.targetBehavior);
         await this.fill(this.replacementActivities, data.replacementActivities);
         await this.fill(this.interventions, data.interventions);
         await this.fill(this.tempBehavior, data.tempBehavior);
     }
-  
+
 }

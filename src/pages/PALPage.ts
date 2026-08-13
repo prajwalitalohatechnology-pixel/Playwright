@@ -16,14 +16,12 @@ export class PalPage extends CommonUtility {
     readonly amount3;
     readonly saveButton;
     readonly palCard;
-    readonly transactionstype;
+    readonly transactionTypeDropdown;
     readonly depositOption;
     readonly depositamount;
     readonly dateoftransaction;
-    readonly perposeDropdown;
-    readonly perposeOption;
+    readonly purposeDropdown;
     readonly statusDropdown;
-    readonly statusOption;
     readonly customizableNoteLabel;
     readonly paltransactionDeposit;
 
@@ -45,14 +43,12 @@ export class PalPage extends CommonUtility {
         this.amount3 = page.locator('(//input[@type="text"])[3]');
         this.saveButton = page.locator('button').filter({ hasText: /^Save$/ }).first();
         this.palCard = page.locator('(//div[@class="card-content"])[1]');
-        this.transactionstype = page.getByRole('combobox', { name: /transaction type/i });
+        this.transactionTypeDropdown = page.getByRole('combobox', {name: /transaction type/i});
         this.depositOption = page.getByRole('option').filter({ hasText: /deposit/i });
         this.depositamount = page.locator('//input[@type="number"]');
         this.dateoftransaction = page.locator('mat-form-field').filter({ hasText: /Date of Transaction/i }).getByLabel('Open calendar');
-        this.perposeDropdown = page.getByRole('combobox', { name: /purpose/i });
-        this.perposeOption = page.getByRole('option').filter({ hasText: /allowance/i });
+        this.purposeDropdown = page.getByRole('combobox', { name: /purpose/i });
         this.statusDropdown = page.getByRole('combobox', { name: /status/i });
-        this.statusOption = page.getByRole('option').filter({ hasText: /draft/i }); //this.page.locator('//mat-option//span'); 
         this.customizableNoteLabel = page.getByText('Customizable Note Label');
         this.paltransactionDeposit = page.getByText('PAL Transaction Deposit');
 
@@ -65,7 +61,7 @@ export class PalPage extends CommonUtility {
         await this.click(this.addButton);
         await this.click(this.createButton);
         const selectedDate = await this.selectRandomFutureDate(this.startDateIcon);
-        const typeDropdownOption = await this.selectRandomOption(this.typeDropdown, this.typeOption);
+        const typeDropdownOption = await this.selectRandomOption(this.typeDropdown);
 
     }
     async fillPALInformation(data: any) {
@@ -81,12 +77,12 @@ export class PalPage extends CommonUtility {
     async createTransactions(data: any) {
         await this.click(this.palCard);
         await this.click(this.addButton);
-        await this.click(this.transactionstype);
-        await this.click(this.depositOption);
+        await this.waitForOverlayToClose();
+        await this.selectMatOption(this.transactionTypeDropdown, 'Deposit');
         await this.fill(this.depositamount, data.depositAmount);
         const selectedDate = await this.selectRandomFutureDate(this.dateoftransaction);
-        const selectedPurposeOption = await this.selectRandomOption(this.perposeDropdown, this.perposeOption);
-        const selectedStatusOption = await this.selectRandomOption(this.statusDropdown, this.statusOption);
+        const selectedPurposeOption = await this.selectRandomOption(this.purposeDropdown);
+        const selectedStatusOption = await this.selectRandomOption(this.statusDropdown);
         await this.fill(this.customizableNoteLabel, data.customizableNoteLabel);
         await this.fill(this.paltransactionDeposit, data.paltransactionDeposit);
         await this.click(this.saveButton, true);
