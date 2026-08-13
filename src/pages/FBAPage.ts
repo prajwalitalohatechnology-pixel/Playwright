@@ -59,7 +59,7 @@ export class FBAPage extends CommonUtility {
         // --- FBA Behavior Section ---
         this.behaviors = this.page.getByText('FBA Behavior six');
         this.addBehavior = page.locator('(//a[contains(text(),"ADD NEW")])[5]');
-        this.startDate = page.locator('(//span[@class="mat-mdc-button-touch-target"])[4]');
+        this.startDate = page.locator('mat-form-field').filter({ hasText: /Start Date/i }).getByLabel('Open calendar');
         this.addressed = page.getByRole('combobox', { name: /addressed in bsp/i });
         this.targetBehavior = page.locator('//textarea[@id="txtAreatargetBehavior"]');
         this.replacementActivities = page.locator('//textarea[@id="txtAreafbaField_1"]');
