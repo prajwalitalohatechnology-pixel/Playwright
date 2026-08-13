@@ -38,7 +38,7 @@ export class PalPage extends CommonUtility {
         this.createButton = page.locator("//span[@class='btn-text create-btn-text title']");
         this.startDateIcon = page.locator('(//span[@class="mat-mdc-button-touch-target"])[4]');
         this.typeDropdown = page.getByRole('combobox', { name: /type/i });
-        this.typeOption = this.page.locator('//mat-option//span'); //page.getByRole('option').filter({ hasText: /clothing/i });
+        this.typeOption = page.getByRole('option').filter({ hasText: /clothing/i });
         this.textArea = page.locator('#txtArea');
         this.amount1 = page.locator('(//input[@type="text"])[1]');
         this.amount2 = page.locator('(//input[@type="text"])[2]');
@@ -46,11 +46,11 @@ export class PalPage extends CommonUtility {
         this.saveButton = page.locator('button').filter({ hasText: /^Save$/ }).first();
         this.palCard = page.locator('(//div[@class="card-content"])[1]');
         this.transactionstype = page.getByRole('combobox', { name: /transaction type/i });
-        this.depositOption = this.page.locator('//mat-option//span'); //page.getByRole('option').filter({ hasText: /deposit/i });
+        this.depositOption = page.getByRole('option').filter({ hasText: /deposit/i });
         this.depositamount = page.locator('//input[@type="number"]');
         this.dateoftransaction = page.locator('mat-form-field').filter({ hasText: /Date of Transaction/i }).getByLabel('Open calendar');
         this.perposeDropdown = page.getByRole('combobox', { name: /purpose/i });
-        this.perposeOption = this.page.locator('//mat-option//span'); //page.getByRole('option').filter({ hasText: /allowance/i });
+        this.perposeOption = page.getByRole('option').filter({ hasText: /allowance/i });
         this.statusDropdown = page.getByRole('combobox', { name: /status/i });
         this.statusOption = page.getByRole('option').filter({ hasText: /draft/i }); //this.page.locator('//mat-option//span'); 
         this.customizableNoteLabel = page.getByText('Customizable Note Label');

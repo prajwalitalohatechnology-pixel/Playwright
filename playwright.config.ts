@@ -35,8 +35,8 @@ export default defineConfig({
     trace: 'on-first-retry',
      baseURL: 'https://192.168.70.183/now',
       ignoreHTTPSErrors: true, //  bypass self-signed cert
-     headless: true,
-    browserName: 'chromium',
+     headless: false, // set to false to see the browser UI
+    //browserName: 'chromium',
     navigationTimeout: 60000,
 
      // Take screenshot only on test failure
