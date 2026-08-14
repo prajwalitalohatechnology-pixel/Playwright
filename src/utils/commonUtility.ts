@@ -27,6 +27,24 @@ export class CommonUtility {
         await this.click(locator);
         await this.waitForSpinner();
     }
+
+    async waitForUIToBeReady() {
+    // Wait for spinner
+    await this.page.locator('.container-loader')
+        .waitFor({ state: 'hidden', timeout: 60000 })
+        .catch(() => {});
+
+    // Wait for toast notification
+    await this.page.locator('.ngx-toastr')
+        .waitFor({ state: 'hidden', timeout: 10000 })
+        .catch(() => {});
+
+    // Wait for Angular overlay
+    await this.page.locator('.cdk-overlay-backdrop-showing')
+        .waitFor({ state: 'hidden', timeout: 10000 })
+        .catch(() => {});
+
+    }
     async selectRandomFutureDate(dateIconLocator: Locator): Promise<number> {
     // Wait for any toast notification to disappear
     const toast = this.page.locator('.ngx-toastr');

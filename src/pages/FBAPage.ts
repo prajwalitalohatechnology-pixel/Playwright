@@ -94,6 +94,7 @@ export class FBAPage extends CommonUtility {
         await this.click(this.addBehavior);
         const selectedDate = await this.selectRandomFutureDate(this.startDate);
         const utility = new CommonUtility(this.page);
+        await utility.waitForUIToBeReady();
         await utility.selectMatOption(this.addressed, 'Yes');
         await this.fill(this.targetBehavior, data.targetBehavior);
         await this.fill(this.replacementActivities, data.replacementActivities);
