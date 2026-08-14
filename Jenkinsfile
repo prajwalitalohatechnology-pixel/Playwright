@@ -11,26 +11,17 @@ pipeline {
 
     stages {
 
-        stage('Debug Environment') {
-            steps {
-                bat 'echo Workspace: %WORKSPACE%'
-                bat 'node -v'
-                bat 'npm -v'
-                bat 'npx playwright --version'
-                bat 'echo Browser Path: %PLAYWRIGHT_BROWSERS_PATH%'
-                bat 'dir C:\\playwright-browsers'
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
-                bat 'npm install'
+                bat 'npm ci'
+                bat 'npx playwright install chromium'
+                bat 'npx playwright --version'
             }
         }
 
         stage('Run Playwright Tests') {
             steps {
-                bat 'npx playwright test --reporter=list'
+                bat 'npx playwright test'
             }
         }
 

@@ -1,113 +1,134 @@
-import { Page, Locator } from '@playwright/test';
+import { expect, Page, Locator } from '@playwright/test';
 
 export class CommonUtility {
     constructor(protected page: Page) { }
 
-    // Safe click (avoids strict mode issues)
     async click(locator: Locator, force = false) {
-        const element = locator.first();
-        await element.waitFor({ state: 'visible', timeout: 60000 });
-        await element.click({ force });
-
+        await locator.click({ force });
     }
 
-    // Safe fill
     async fill(locator: Locator, value: string) {
-        const element = locator.first();
-        await element.waitFor({ state: 'visible', timeout: 60000 });
-        await element.fill(value);
+        await locator.fill(value);
     }
 
     async waitForSpinner() {
-        const spinner = this.page.locator('.container-loader');
-        await spinner.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => { });
+        await expect(this.page.locator('.container-loader:visible')).toHaveCount(0, {
+            timeout: 60000
+        });
     }
 
     async clickAndWait(locator: Locator) {
         await this.click(locator);
         await this.waitForSpinner();
     }
-
-    async waitForUIToBeReady() {
-    // Wait for spinner
-    await this.page.locator('.container-loader')
-        .waitFor({ state: 'hidden', timeout: 60000 })
-        .catch(() => {});
-
-    // Wait for toast notification
-    await this.page.locator('.ngx-toastr')
-        .waitFor({ state: 'hidden', timeout: 10000 })
-        .catch(() => {});
-
-    // Wait for Angular overlay
-    await this.page.locator('.cdk-overlay-backdrop-showing')
-        .waitFor({ state: 'hidden', timeout: 10000 })
-        .catch(() => {});
-
-    }
-    async selectRandomFutureDate(dateIconLocator: Locator): Promise<number> {
-    // Wait for any toast notification to disappear
-    const toast = this.page.locator('.ngx-toastr');
-
-    if (await toast.count() > 0) {
-        await toast.first().waitFor({
-            state: 'hidden',
-            timeout: 10000
-        }).catch(() => {});
-    }
-
-    // Wait for any overlay backdrop to disappear
-    const backdrop = this.page.locator('.cdk-overlay-backdrop-showing');
-
-    if (await backdrop.count() > 0) {
-        await backdrop.first().waitFor({
-            state: 'hidden',
-            timeout: 10000
-        }).catch(() => {});
-    }
-
-    // Now click the calendar
-    await dateIconLocator.waitFor({
-        state: 'visible',
-        timeout: 60000
-    });
-
-    await dateIconLocator.click();
-
-    // Continue with date selection...
-    const enabledDates = this.page.locator(
-        '//td[contains(@class,"mat-calendar-body-cell") and not(contains(@class,"mat-calendar-body-disabled"))]//span[contains(@class,"mat-calendar-body-cell-content")]'
-    );
-
-    await enabledDates.first().waitFor({
-        state: 'visible',
-        timeout: 10000
-    });
-
-    const count = await enabledDates.count();
-
-    const today = new Date().getDate();
-    const futureIndexes: number[] = [];
-
-    for (let i = 0; i < count; i++) {
-        const text = (await enabledDates.nth(i).textContent())?.trim() || '';
-        const day = Number(text);
-
-        if (!Number.isNaN(day) && day >= today) {
-            futureIndexes.push(i);
+    async selectRandomFutureDate(dateIconLocator: Locator, minimumOffset = 0): Promise<number> {
+        try {
+            await this.waitForUIToBeReady();
+        } catch (error) {
+            // UI not ready, continue anyway
         }
-    }
 
-    const randomIndex =
-        futureIndexes[Math.floor(Math.random() * futureIndexes.length)];
+        try {
+            await dateIconLocator.first().click();
+        } catch (error) {
+            if (error instanceof Error && error.message.includes('Target page, context or browser has been closed')) {
+                throw error;
+            }
+            // Retry once
+            await dateIconLocator.first().click();
+        }
 
-    const selectedDay = Number(
-        (await enabledDates.nth(randomIndex).textContent())?.trim()
-    );
+        // Wait longer for calendar to appear and render
+        await this.page.waitForTimeout(1000);
 
-    await enabledDates.nth(randomIndex).click();
+        // Try multiple selectors for calendar dates
+        let dates = this.page.locator('td.mat-calendar-body-cell:not(.mat-calendar-body-disabled) .mat-calendar-body-cell-content');
+        let count = await dates.count();
 
-    return selectedDay;
+        // If the first selector doesn't work, try alternate selectors
+        if (count === 0) {
+            dates = this.page.locator('.mat-calendar-body-cell-content');
+            count = await dates.count();
+        }
+
+        if (count === 0) {
+            dates = this.page.locator('button.mat-calendar-body-cell');
+            count = await dates.count();
+        }
+
+        if (count === 0) {
+            throw new Error('No dates found in calendar picker');
+        }
+
+        try {
+            await dates.first().waitFor({
+                state: 'visible',
+                timeout: 5000
+            });
+        } catch (error) {
+            if (error instanceof Error && error.message.includes('Target page, context or browser has been closed')) {
+                throw error;
+            }
+        }
+
+        const today = new Date().getDate();
+        let selectedIndex = 0;
+        let hasValidDate = false;
+
+        // First try to find a future date
+        for (let i = 0; i < count; i++) {
+            try {
+                const dayText = (await dates.nth(i).textContent())?.trim();
+                const day = Number(dayText);
+
+                if (!Number.isNaN(day) && day > 0 && day <= 31) {
+                    if (day >= today + minimumOffset) {
+                        selectedIndex = i;
+                        hasValidDate = true;
+                        break;
+                    }
+                }
+            } catch (e) {
+                // Skip this element if we can't read it
+            }
+        }
+
+        // If no future date found, pick first valid date
+        if (!hasValidDate) {
+            for (let i = 0; i < count; i++) {
+                try {
+                    const dayText = (await dates.nth(i).textContent())?.trim();
+                    const day = Number(dayText);
+
+                    if (!Number.isNaN(day) && day > 0 && day <= 31) {
+                        selectedIndex = i;
+                        hasValidDate = true;
+                        break;
+                    }
+                } catch (e) {
+                    // Skip this element
+                }
+            }
+        }
+
+        if (!hasValidDate) {
+            // Just pick a random date
+            selectedIndex = Math.floor(Math.random() * count);
+        }
+
+        const selectedDay = Number(
+            (await dates.nth(selectedIndex).textContent())?.trim()
+        );
+
+        await dates.nth(selectedIndex).click();
+
+        try {
+            await this.waitForUIToBeReady();
+        } catch (error) {
+            // UI may not be ready, continue
+        }
+
+        return selectedDay;
 
     }
     async waitForVisible(locator: Locator) {
@@ -136,69 +157,72 @@ export class CommonUtility {
         await this.click(addButton);
         await this.click(createButton);
     }
-    // =========================
-    // Angular Material Dropdown Utilities
-    // =========================
-
     /**
      * Select an option from Angular Material dropdown by visible text.
      */
-   async selectMatOption(dropdown: Locator, optionText: string): Promise<void> {
-    // Close any existing overlay first
-    try {
-        const backdrop = this.page.locator('.cdk-overlay-backdrop-showing');
+    async selectMatOption(dropdown: Locator, optionText: string): Promise<void> {
+        await this.waitForUIToBeReady();
 
-        if (await backdrop.count() > 0) {
-            await this.page.keyboard.press('Escape');
-            await backdrop.first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
-        }
-    } catch (error) {
-        // Page context may have been closed, continue with dropdown interaction
+        await dropdown.first().waitFor({
+            state: 'visible',
+            timeout: 60000
+        });
+
+        await dropdown.first().click();
+
+        const option = this.page
+            .getByRole('option')
+            .filter({ hasText: optionText });
+
+        await option.first().waitFor({
+            state: 'visible',
+            timeout: 10000
+        });
+
+        await option.first().click();
+
+        await this.waitForUIToBeReady();
     }
-
-    await dropdown.waitFor({ state: 'visible', timeout: 60000 });
-    await dropdown.click();
-
-    const option = this.page
-        .locator('mat-option')
-        .filter({ hasText: optionText });
-
-    await option.first().waitFor({ state: 'visible', timeout: 10000 });
-    await option.first().click();
-}
 
     /**
      * Select a random option from Angular Material dropdown.
      * Returns the selected option text.
      */
     async selectRandomOption(dropdown: Locator): Promise<string> {
-        await dropdown.waitFor({ state: 'visible', timeout: 60000 });
-        await dropdown.click();
+        await this.waitForUIToBeReady();
+
+        await dropdown.first().click();
+
         const options = this.page.locator('mat-option');
-        await options.first().waitFor({ state: 'visible', timeout: 10000 });
+
+        await options.first().waitFor({
+            state: 'visible',
+            timeout: 10000
+        });
+
         const count = await options.count();
+
         if (count === 0) {
             throw new Error('No dropdown options found');
         }
+
         const randomIndex = Math.floor(Math.random() * count);
+
         const option = options.nth(randomIndex);
-        const selectedText = (await option.textContent())?.trim() || '';
+
+        const text = (await option.textContent())?.trim() || '';
+
         await option.click();
-        return selectedText;
+
+        await this.waitForUIToBeReady();
+
+        return text;
 
     }
-        async waitForOverlayToClose() {
-    const backdrop = this.page.locator('.cdk-overlay-backdrop-showing');
 
-    if (await backdrop.count() > 0) {
-        await backdrop.first().waitFor({
-            state: 'hidden',
-            timeout: 10000
-        }).catch(() => {});
+    async waitForUIToBeReady() {
+        await expect(this.page.locator('.container-loader:visible')).toHaveCount(0, {
+            timeout: 30000
+        });
     }
 }
-    }
-
-
-
-

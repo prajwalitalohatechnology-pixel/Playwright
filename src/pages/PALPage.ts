@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import { CommonUtility } from '../utils/commonUtility';
 import { palData } from '../utils/testData';
 
@@ -8,6 +8,7 @@ export class PalPage extends CommonUtility {
     readonly addButton;
     readonly createButton;
     readonly startDateIcon;
+    readonly endDateIcon;
     readonly typeDropdown;
     readonly typeOption;
     readonly textArea;
@@ -24,6 +25,7 @@ export class PalPage extends CommonUtility {
     readonly statusDropdown;
     readonly customizableNoteLabel;
     readonly paltransactionDeposit;
+    private palRecord?: Locator;
 
 
     // Locators
@@ -35,6 +37,7 @@ export class PalPage extends CommonUtility {
         this.addButton = page.getByText('ADD NEW');
         this.createButton = page.locator("//span[@class='btn-text create-btn-text title']");
         this.startDateIcon = page.locator('(//span[@class="mat-mdc-button-touch-target"])[4]');
+        this.endDateIcon = page.locator('mat-form-field').filter({ hasText: /End Date/i }).getByLabel('Open calendar');
         this.typeDropdown = page.getByRole('combobox', { name: /type/i });
         this.typeOption = page.getByRole('option').filter({ hasText: /clothing/i });
         this.textArea = page.locator('#txtArea');
@@ -69,20 +72,26 @@ export class PalPage extends CommonUtility {
         await this.fill(this.amount1, data.amountOfCashAndCashEquivalentsAtTheParticipantsResidenceDayProgram);
         await this.fill(this.amount2, data.amountOfMoneyInTheParticipantOwnedAccount);
         await this.fill(this.amount3, data.amountOfMoneyInTheParticipantAgencyBankAccount);
-        await this.click(this.saveButton, true);
+        await this.selectRandomFutureDate(this.endDateIcon, 1);
+        await this.click(this.saveButton);
         await this.waitForSpinner();
-        await this.waitForVisible(this.palCard);
+        this.palRecord = this.page.getByText(data.description, { exact: true }).last();
+        await expect(this.palRecord).toBeVisible();
 
     }
     async createTransactions(data: any) {
-        await this.click(this.palCard);
+        if (!this.palRecord) {
+            throw new Error('PAL record must be saved before a transaction can be created');
+        }
+        await this.click(this.palRecord);
         await this.click(this.addButton);
-        await this.waitForOverlayToClose();
+        await this.waitForUIToBeReady();
         await this.selectMatOption(this.transactionTypeDropdown, 'Deposit');
         await this.fill(this.depositamount, data.depositAmount);
         const selectedDate = await this.selectRandomFutureDate(this.dateoftransaction);
         const selectedPurposeOption = await this.selectRandomOption(this.purposeDropdown);
-        const selectedStatusOption = await this.selectRandomOption(this.statusDropdown);
+        await this.waitForUIToBeReady();
+        await this.selectRandomOption(this.statusDropdown);
         await this.fill(this.customizableNoteLabel, data.customizableNoteLabel);
         await this.fill(this.paltransactionDeposit, data.paltransactionDeposit);
         await this.click(this.saveButton, true);

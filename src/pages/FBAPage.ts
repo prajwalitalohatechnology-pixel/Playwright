@@ -20,7 +20,7 @@ export class FBAPage extends CommonUtility {
     readonly behaviors;
     readonly addBehavior;
     readonly startDate;
-    readonly addressed;
+    readonly addressedDropdown;
     readonly targetBehavior;
     readonly replacementActivities;
     readonly interventions;
@@ -60,7 +60,7 @@ export class FBAPage extends CommonUtility {
         this.behaviors = this.page.getByText('FBA Behavior six');
         this.addBehavior = page.locator('(//a[contains(text(),"ADD NEW")])[5]');
         this.startDate = page.locator('mat-form-field').filter({ hasText: /Start Date/i }).getByLabel('Open calendar');
-        this.addressed = page.getByRole('combobox', { name: /addressed in bsp/i });
+        this.addressedDropdown = page.getByRole('combobox', { name: /addressed in bsp/i });
         this.targetBehavior = page.locator('//textarea[@id="txtAreatargetBehavior"]');
         this.replacementActivities = page.locator('//textarea[@id="txtAreafbaField_1"]');
         this.interventions = page.locator('//textarea[@id="txtAreafbaField_2"]');
@@ -93,9 +93,8 @@ export class FBAPage extends CommonUtility {
         await this.click(this.behaviors);
         await this.click(this.addBehavior);
         const selectedDate = await this.selectRandomFutureDate(this.startDate);
-        const utility = new CommonUtility(this.page);
-        await utility.waitForUIToBeReady();
-        await utility.selectMatOption(this.addressed, 'Yes');
+        await this.waitForUIToBeReady();
+        await this.selectMatOption(this.addressedDropdown, 'Yes');
         await this.fill(this.targetBehavior, data.targetBehavior);
         await this.fill(this.replacementActivities, data.replacementActivities);
         await this.fill(this.interventions, data.interventions);

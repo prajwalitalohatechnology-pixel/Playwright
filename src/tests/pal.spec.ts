@@ -8,12 +8,16 @@ import { loginData } from '../utils/loginData';
 test('To verify PAL functionality', async ({ page }) => {
   const loginPage = new LoginPage(page);
   const palPage = new PalPage(page);
+  const palRunData = {
+    ...palData,
+    description: `Playwright PAL ${Date.now()}`,
+  };
 
   await loginPage.navigate();
   await loginPage.login(loginData.username, loginData.password);
 
   // PAL Flow
   await palPage.createPAL();
-  await palPage.fillPALInformation(palData);
-  await palPage.createTransactions(palData);
+  await palPage.fillPALInformation(palRunData);
+  await palPage.createTransactions(palRunData);
 });
