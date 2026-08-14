@@ -95,8 +95,6 @@ export class PalPage extends CommonUtility {
         await this.fill(this.customizableNoteLabel, data.customizableNoteLabel);
         await this.fill(this.paltransactionDeposit, data.paltransactionDeposit);
         await this.click(this.saveButton, true);
-
-
     }
 }
 

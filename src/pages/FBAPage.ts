@@ -100,5 +100,4 @@ export class FBAPage extends CommonUtility {
         await this.fill(this.interventions, data.interventions);
         await this.fill(this.tempBehavior, data.tempBehavior);
     }
-
 }
