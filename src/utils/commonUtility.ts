@@ -145,11 +145,15 @@ export class CommonUtility {
      */
    async selectMatOption(dropdown: Locator, optionText: string): Promise<void> {
     // Close any existing overlay first
-    const backdrop = this.page.locator('.cdk-overlay-backdrop-showing');
+    try {
+        const backdrop = this.page.locator('.cdk-overlay-backdrop-showing');
 
-    if (await backdrop.count() > 0) {
-        await this.page.keyboard.press('Escape');
-        await backdrop.first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+        if (await backdrop.count() > 0) {
+            await this.page.keyboard.press('Escape');
+            await backdrop.first().waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+        }
+    } catch (error) {
+        // Page context may have been closed, continue with dropdown interaction
     }
 
     await dropdown.waitFor({ state: 'visible', timeout: 60000 });
