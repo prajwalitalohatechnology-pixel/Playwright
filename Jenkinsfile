@@ -27,9 +27,9 @@ pipeline {
             }
         }
 
-        stage('Run Jenkins Smoke Test') {
+        stage('Run All Playwright Tests') {
             steps {
-                bat 'npx playwright test src/tests/jenkins.test.ts --reporter=list,html'
+                bat 'npx playwright test --reporter=list,html'
             }
         }
     }
