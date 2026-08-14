@@ -1,43 +1,42 @@
 pipeline {
-agent any
+    agent any
 
-```
-tools {
-    nodejs 'NodeJS18'
-}
+    options {
+        skipDefaultCheckout(true)
+    }
 
-environment {
-    PLAYWRIGHT_BROWSERS_PATH = 'C:\\playwright-browsers'
-}
+    tools {
+        nodejs 'NodeJS18'
+    }
 
-stages {
+    environment {
+        PLAYWRIGHT_BROWSERS_PATH = 'C:\\playwright-browsers'
+    }
 
-    stage('Checkout') {
-        steps {
-            checkout scm
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                bat 'npm ci'
+                bat 'npx playwright install chromium'
+                bat 'npx playwright --version'
+            }
+        }
+
+        stage('Run Jenkins Smoke Test') {
+            steps {
+                bat 'npx playwright test src/tests/jenkins.test.ts --reporter=list,html'
+            }
         }
     }
 
-    stage('Install Dependencies') {
-        steps {
-            bat 'npm ci'
-        }
-    }
-
-    stage('Install Playwright Browsers') {
-        steps {
-            bat 'npx playwright install chromium'
-        }
-    }
-
-    stage('Run Playwright Tests') {
-        steps {
-            bat 'npx playwright test --reporter=list,html'
-        }
-    }
-
-    stage('Publish HTML Report') {
-        steps {
+    post {
+        always {
             publishHTML(target: [
                 reportDir: 'playwright-report',
                 reportFiles: 'index.html',
@@ -46,25 +45,8 @@ stages {
                 alwaysLinkToLastBuild: true,
                 allowMissing: true
             ])
+            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true, allowEmptyArchive: true
+            archiveArtifacts artifacts: 'test-results/**', fingerprint: true, allowEmptyArchive: true
         }
     }
-}
-
-post {
-    always {
-        archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
-        archiveArtifacts artifacts: 'test-results/**', fingerprint: true
-        echo 'Pipeline execution completed.'
-    }
-
-    success {
-        echo 'Playwright tests passed successfully.'
-    }
-
-    failure {
-        echo 'Playwright tests failed.'
-    }
-}
-```
-
 }
