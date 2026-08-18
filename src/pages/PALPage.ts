@@ -25,7 +25,9 @@ export class PalPage extends CommonUtility {
     readonly statusDropdown;
     readonly customizableNoteLabel;
     readonly paltransactionDeposit;
+    readonly btnToasterMessageClose;
     private palRecord?: Locator;
+    
 
 
     // Locators
@@ -54,6 +56,7 @@ export class PalPage extends CommonUtility {
         this.statusDropdown = page.getByRole('combobox', { name: /status/i });
         this.customizableNoteLabel = page.getByText('Customizable Note Label');
         this.paltransactionDeposit = page.getByText('PAL Transaction Deposit');
+        this.btnToasterMessageClose = this.page.getByRole('button', { name: 'Close' });
 
     }
 

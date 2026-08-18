@@ -225,4 +225,27 @@ export class CommonUtility {
             timeout: 30000
         });
     }
+    async closeAllToastMessages(): Promise<void> {
+
+        const toastCloseButtons = this.page.locator('.toast-container span:has-text("×"), [role="alert"] span:has-text("×"), .toast-close-button');
+
+        let count = await toastCloseButtons.count();
+
+        if (count === 0) {
+            const backupButtons = this.page.locator('.toast-message, .toast-container').locator('text=×');
+            count = await backupButtons.count();
+        }
+
+        while (await toastCloseButtons.count() > 0) {
+            try {
+
+                await toastCloseButtons.first().click({ force: true, timeout: 2000 });
+
+                await this.page.waitForTimeout(400);
+            } catch (error) {
+                break;
+            }
+        }
+        console.log("All popups dismissed.");
+    }
 }
