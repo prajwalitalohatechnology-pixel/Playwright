@@ -36,7 +36,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
      baseURL: 'https://192.168.70.183/now',
       ignoreHTTPSErrors: true, //  bypass self-signed cert
-     headless: true,
+     headless: false,
     //browserName: 'chromium',
        actionTimeout: 30000,
      navigationTimeout: 60000,
