@@ -12,13 +12,13 @@ import path from 'path';
 
 // How do you perform login?
 
-// test('To verify login functionality', async ({page}) => {
-//   await page.goto('https://www.saucedemo.com/');
-//   await page.getByRole('textbox', { name: 'Username' }).fill('standard_user');
-//   await page.getByRole('textbox', { name: 'Password' }).fill('secret_sauce');
-//   await page.getByRole('button', { name: 'Login' }).click();
-//   await expect(page).toHaveTitle('Swag Labs');
-// });
+test('To verify login functionality', async ({page}) => {
+  await page.goto('https://www.saucedemo.com/');
+  await page.getByRole('textbox', { name: 'Username' }).fill('standard_user');
+  await page.getByRole('textbox', { name: 'Password' }).fill('secret_sauce');
+  await page.getByRole('button', { name: 'Login' }).click();
+  await expect(page).toHaveTitle('Swag Labs');
+});
 
 //-------------------------------------------------------------------------------
 // How do you handle a dynamic dropdown?
@@ -146,6 +146,21 @@ test('Upload multiple files', async ({ page }) => {
   await expect(page.getByText('credentials-filled-chromium-win32.png')).toBeVisible();
 });
 
+//--------------------------------------------------------------------------------
+
+  // How do you download a file?
+//   test('Download a file', async ({ page }) => {
+//     await page.goto('https://file-examples.com/index.php/sample-documents-download/sample-pdf-download/');
+//     const [Download] = await Promise.all([
+//       page.waitForEvent('download'),
+//         page.getByRole('link', { name: 'Download sample pdf file' }).first().click(),
+//     ]);
+
+//  expect(Download.suggestedFilename()).toBe('file-sample_150kB.pdf');
+});
+
+   
+    
 
 
 
